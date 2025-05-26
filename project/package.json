@@ -1,0 +1,33 @@
+{
+  "name": "project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.12.0",
+    "@hookform/resolvers": "^5.0.1",
+    "@supabase/supabase-js": "^2.49.8",
+    "autoprefixer": "^10.4.21",
+    "next": "15.3.2",
+    "postcss": "^8.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.56.4",
+    "tailwindcss": "^3.4.17",
+    "zod": "^3.25.28"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2",
+    "typescript": "^5"
+  }
+}
