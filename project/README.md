@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zugol - Go Rating System
 
-## Getting Started
+A Next.js application for tracking Go (Weiqi/Baduk) player ratings with a sophisticated rank stability system.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Player Rating System**: Traditional Go ranks (25k-9d) with point-based calculations
+- **Rank Stability**: Prevents rank oscillation with a 5-game freeze period after rank changes
+- **Visual Feedback**: Asterisk notation (*) shows recently changed ranks
+- **Real-time Updates**: Live rating and rank updates after each game
+
+## Database Setup
+
+Run the migration in your Supabase SQL editor:
+
+```sql
+-- Use either the simplified migration for existing databases:
+-- supabase-simplified-rank-migration.sql
+
+-- Or the complete setup for new databases:
+-- supabase-final-migration.sql
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-## Learn More
+## Testing
 
-To learn more about Next.js, take a look at the following resources:
+Visit `/test-ranking` to test the rank stability system:
+- Simulate wins and losses
+- Observe rank changes and asterisk behavior
+- Test the 5-game freeze period
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Rank System
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Rating Points**: Each rank spans 13 points (25k=0-12, 24k=13-25, etc.)
+- **New Players**: Start at 15k (137 points)
+- **Rank Changes**: Only occur when outside the 5-game freeze period
+- **Display Logic**: Shows frozen rank with asterisk during freeze period
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See `RANK_STABILITY_SYSTEM.md` for detailed information about the rank stability implementation.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Deployment**: Vercel

@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { ratingPointsToRank } from '@/lib/supabase'
 
 export default function HomePage() {
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, profile, loading, signOut, getDisplayRank } = useAuth()
 
   const handleSignOut = async () => {
     await signOut()
@@ -27,7 +26,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto flex justify-between items-center">
             <div className="text-sm text-gray-300">
               Signed in as <span className="text-white font-medium">{profile.name}</span>
-              <span className="text-gray-400 ml-2">({ratingPointsToRank(profile.rating_points)})</span>
+              <span className="text-gray-400 ml-2">({getDisplayRank()})</span>
             </div>
             <button
               onClick={handleSignOut}
@@ -53,17 +52,23 @@ export default function HomePage() {
             // Logged in state
             <div className="space-y-6">
               <div className="bg-gray-800 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-white mb-2">Welcome back!</h2>
+                <h2 className="text-xl font-semibold text-white mb-2">Welcome back, {profile.name}!</h2>
                 <p className="text-gray-300 mb-4">
                   Current rank: <span className="text-blue-400 font-medium">
-                    {ratingPointsToRank(profile.rating_points)}
+                    {getDisplayRank()}
                   </span>
                 </p>
-                <p className="text-gray-300">
+                <p className="text-gray-300 mb-6">
                   Rating points: <span className="text-blue-400 font-medium">
                     {profile.rating_points}
                   </span>
                 </p>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                >
+                  Sign Out
+                </button>
               </div>
               
               <div className="space-y-3">
@@ -73,12 +78,12 @@ export default function HomePage() {
                 <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
                   Report Game Result
                 </button>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                <Link
+                  href="/test-ranking"
+                  className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-center"
                 >
-                  Sign Out
-                </button>
+                  Test Ranking System
+                </Link>
               </div>
             </div>
           ) : (

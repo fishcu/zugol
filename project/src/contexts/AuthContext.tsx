@@ -2,12 +2,15 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase, getDisplayRank } from '@/lib/supabase'
 
 interface Profile {
   id: string
   name: string
   rating_points: number
+  last_rank_reached: string
+  games_at_last_rank_change: number
+  total_games_played: number
   created_at: string
   updated_at: string
 }
@@ -17,6 +20,8 @@ interface AuthContextType {
   profile: Profile | null
   loading: boolean
   signOut: () => Promise<void>
+  getDisplayRank: () => string
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -82,11 +87,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut()
   }
 
+  const getDisplayRankForProfile = () => {
+    if (!profile) return '15k'
+    return getDisplayRank(profile)
+  }
+
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id)
+    }
+  }
+
   const value = {
     user,
     profile,
     loading,
     signOut,
+    getDisplayRank: getDisplayRankForProfile,
+    refreshProfile,
   }
 
   return (
