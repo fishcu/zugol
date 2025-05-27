@@ -24,4 +24,79 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  .bg-gray-750 {
+    background-color: rgb(55 65 81 / 0.5);
+  }
+  
+  /* Layout: CSS Grid for main content with ladder peek */
+  .layout-container {
+    display: grid;
+    grid-template-rows: 85vh auto;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* Ladder table: Stable alternating rows */
+  .ladder-tbody {
+    transition: none !important;
+  }
+  
+  .ladder-tbody tr {
+    transition: none !important;
+  }
+  
+  .ladder-tbody tr:nth-child(even) {
+    background-color: rgb(31 41 55) !important;
+  }
+  
+  .ladder-tbody tr:nth-child(odd) {
+    background-color: rgb(55 65 81 / 0.5) !important;
+  }
+  
+  .ladder-tbody tr:hover {
+    background-color: rgb(55 65 81) !important;
+    transition: background-color 0.15s ease !important;
+  }
+  
+  /* Current user highlighting */
+  .ladder-tbody tr.current-user-row {
+    border-left: 3px solid rgb(147 197 253) !important;
+    position: relative;
+  }
+  
+  .ladder-tbody tr.current-user-row:hover {
+    background-color: rgb(55 65 81) !important;
+  }
+  
+  /* Rank column: Stable height for medals and numbers */
+  .rank-cell {
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.5rem;
+  }
+  
+  .rank-cell .medal-icon {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+  }
+  
+  .rank-cell .rank-number {
+    display: inline-block;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
 }
