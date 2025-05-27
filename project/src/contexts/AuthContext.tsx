@@ -31,6 +31,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
+  console.log('AuthProvider render - user:', !!user, 'profile:', !!profile, 'loading:', loading)
+
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
@@ -46,13 +48,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialSession()
 
-    // Listen for auth changes
+    // Listen for auth changes - IMPORTANT: No async Supabase calls in this callback!
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('Auth state change:', event, !!session?.user)
         setUser(session?.user ?? null)
         
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          // Use setTimeout to avoid deadlock as per Supabase docs
+          setTimeout(() => {
+            fetchProfile(session.user.id)
+          }, 0)
         } else {
           setProfile(null)
         }
@@ -61,7 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchProfile = async (userId: string) => {
@@ -84,7 +92,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    const timestamp = new Date().toISOString()
+    console.log(`[${timestamp}] === SIGNOUT FUNCTION CALLED ===`)
+    console.log(`[${timestamp}] Current user:`, !!user, user?.id)
+    
+    try {
+      console.log(`[${timestamp}] Calling supabase.auth.signOut()...`)
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error(`[${timestamp}] Error signing out:`, error)
+      } else {
+        console.log(`[${timestamp}] Sign out successful`)
+      }
+    } catch (error) {
+      console.error(`[${timestamp}] Unexpected error during sign out:`, error)
+    }
+    
+    console.log(`[${timestamp}] === SIGNOUT FUNCTION COMPLETED ===`)
   }
 
   const getDisplayRankForProfile = () => {

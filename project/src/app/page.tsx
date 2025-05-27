@@ -7,10 +7,6 @@ import Ladder from '@/components/Ladder'
 export default function HomePage() {
   const { user, profile, loading, signOut, getDisplayRank } = useAuth()
 
-  const handleSignOut = async () => {
-    await signOut()
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -32,7 +28,7 @@ export default function HomePage() {
                   <span className="text-gray-400 ml-2">({getDisplayRank()})</span>
                 </div>
                 <button
-                  onClick={handleSignOut}
+                  onClick={signOut}
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Sign out
@@ -66,7 +62,7 @@ export default function HomePage() {
                       </span>
                     </p>
                     <button
-                      onClick={handleSignOut}
+                      onClick={signOut}
                       className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
                       Sign Out
