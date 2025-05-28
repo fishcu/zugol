@@ -39,34 +39,27 @@ export default function GameSettingsDisplay({ gameSettings, className = '' }: Ga
 
   return (
     <div className={`bg-gray-800 rounded-lg p-6 ${className}`}>
-      {/* Special Nigiri Notice */}
-      {isNigiri && (
-        <div className="bg-yellow-900 bg-opacity-50 border border-yellow-600 rounded-lg p-4 mb-6">
-          <div className="text-center text-yellow-200">
-            <div className="font-medium">Player colors are assigned randomly (Nigiri)</div>
-            <div className="text-sm mt-1">
-              Standard 6.5 komi
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Rating Information */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-3">Rating Information</h3>
+        <h3 className="text-lg font-semibold text-white mb-1">Rating Information</h3>
+        <p className="text-gray-400 text-sm mb-3">Used to determine player colors and game rules</p>
         <div className="bg-gray-700 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-gray-400 text-sm">{blackPlayer.name}'s Rating</div>
-              <div className="text-white font-medium">{blackPlayer.ratingPoints} pts</div>
+              <div className="text-white font-bold text-lg">
+                {blackPlayer.ratingPoints} pts <span className="text-blue-400 text-sm">({blackPlayerProfile ? getDisplayRank(blackPlayerProfile) : getFallbackRank(blackPlayer.ratingPoints)})</span>
+              </div>
             </div>
             <div>
               <div className="text-gray-400 text-sm">Rating Difference</div>
-              <div className="text-blue-400 font-bold text-lg">{ratingDifference} pts</div>
+              <div className="text-amber-300 font-bold text-2xl">{ratingDifference} pts</div>
             </div>
             <div>
               <div className="text-gray-400 text-sm">{whitePlayer.name}'s Rating</div>
-              <div className="text-white font-medium">{whitePlayer.ratingPoints} pts</div>
+              <div className="text-white font-bold text-lg">
+                {whitePlayer.ratingPoints} pts <span className="text-blue-400 text-sm">({whitePlayerProfile ? getDisplayRank(whitePlayerProfile) : getFallbackRank(whitePlayer.ratingPoints)})</span>
+              </div>
             </div>
           </div>
         </div>
@@ -75,6 +68,16 @@ export default function GameSettingsDisplay({ gameSettings, className = '' }: Ga
       {/* Player Colors */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white mb-3">Player Colors</h3>
+        
+        {/* Special Nigiri Notice */}
+        {isNigiri && (
+          <div className="bg-blue-900 bg-opacity-30 border border-blue-600 rounded-lg p-3 mb-4">
+            <div className="text-center text-blue-200">
+              <div className="font-medium">Player colors are assigned at random (Nigiri)</div>
+            </div>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Black Player */}
           <div className="bg-gray-700 rounded-lg p-4">
@@ -82,7 +85,7 @@ export default function GameSettingsDisplay({ gameSettings, className = '' }: Ga
               <span className="text-4xl mr-3">{isNigiri ? '⚫/⚪' : '⚫'}</span>
               <div className="text-center">
                 <div className="text-white font-medium text-lg">
-                  {blackPlayer.name} ({blackPlayerProfile ? getDisplayRank(blackPlayerProfile) : getFallbackRank(blackPlayer.ratingPoints)})
+                  {blackPlayer.name}
                 </div>
               </div>
             </div>
@@ -94,7 +97,7 @@ export default function GameSettingsDisplay({ gameSettings, className = '' }: Ga
               <span className="text-4xl mr-3">{isNigiri ? '⚪/⚫' : '⚪'}</span>
               <div className="text-center">
                 <div className="text-white font-medium text-lg">
-                  {whitePlayer.name} ({whitePlayerProfile ? getDisplayRank(whitePlayerProfile) : getFallbackRank(whitePlayer.ratingPoints)})
+                  {whitePlayer.name}
                 </div>
               </div>
             </div>
@@ -107,26 +110,26 @@ export default function GameSettingsDisplay({ gameSettings, className = '' }: Ga
         <h3 className="text-lg font-semibold text-white mb-3">Game Rules</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Handicap */}
-          <div className="bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 border border-indigo-600 rounded-lg p-4">
             <div className="flex items-center justify-center space-x-3">
               <div className="text-white text-lg font-medium">Handicap Stones:</div>
-              <div className="text-2xl font-bold text-white">{handicapStones}</div>
+              <div className="text-2xl font-bold text-indigo-200">{handicapStones}</div>
             </div>
           </div>
 
           {/* Komi */}
-          <div className="bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-teal-800 to-teal-900 border border-teal-600 rounded-lg p-4">
             <div className="flex flex-col items-center">
               <div className="flex items-center justify-center space-x-3">
                 <div className="text-white text-lg font-medium">Komi:</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-2xl font-bold text-teal-200">
                   {formatKomi(komi)}
                 </div>
               </div>
               
               {/* Reverse komi hint */}
               {komi < 0 && (
-                <div className="text-gray-400 text-sm mt-2">
+                <div className="text-teal-300 text-sm mt-2">
                   Black gets {Math.abs(komi)} points
                 </div>
               )}

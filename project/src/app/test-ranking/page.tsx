@@ -62,10 +62,10 @@ export default function TestRankingPage() {
           <h2 className="text-xl font-semibold text-white mb-4">Current Status</h2>
           <div className="space-y-2 text-gray-300">
             <p><span className="text-blue-400">Player:</span> {profile.name}</p>
-            <p><span className="text-blue-400">Rating Points:</span> {profile.rating_points}</p>
-            <p><span className="text-blue-400">Rating-based Rank:</span> {ratingBasedRank}</p>
-            <p><span className="text-blue-400">Last Rank Reached:</span> {profile.last_rank_reached}</p>
-            <p><span className="text-blue-400">Display Rank:</span> <span className="text-lg font-bold">{displayRank}</span></p>
+            <p><span className="text-blue-400">Rating Points:</span> <span className="text-white font-medium">{profile.rating_points}</span></p>
+            <p><span className="text-blue-400">Rating-based Rank:</span> <span className="text-blue-400">{ratingBasedRank}</span></p>
+            <p><span className="text-blue-400">Last Rank Reached:</span> <span className="text-blue-400">{profile.last_rank_reached}</span></p>
+            <p><span className="text-blue-400">Display Rank:</span> <span className="text-lg font-bold text-blue-400">{displayRank}</span></p>
             <p><span className="text-blue-400">Games Since Rank Change:</span> {gamesSinceRankChange}</p>
             <p><span className="text-blue-400">Games at Last Rank Change:</span> {profile.games_at_last_rank_change}</p>
             <p><span className="text-blue-400">Total Games Played:</span> {profile.total_games_played}</p>

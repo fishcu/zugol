@@ -50,35 +50,36 @@ export default function HomePage() {
               {user && profile ? (
                 <div className="space-y-6">
                   <div className="bg-gray-800 rounded-lg p-6">
-                    <h2 className="text-xl font-semibold text-white mb-2">Welcome back, {profile.name}!</h2>
-                    <p className="text-gray-300 mb-4">
-                      Current rank: <span className="text-blue-400 font-medium">
-                        {getDisplayRank()}
-                      </span>
-                    </p>
-                    <p className="text-gray-300 mb-6">
-                      Rating points: <span className="text-blue-400 font-medium">
-                        {profile.rating_points}
-                      </span>
-                    </p>
-                    <button
-                      onClick={signOut}
-                      className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
-                    >
-                      Sign out
-                    </button>
+                    <h2 className="text-xl font-semibold text-white mb-4">Welcome back, {profile.name}!</h2>
+                    
+                    <div className="space-y-3 mb-6">
+                      <div>
+                        <div className="text-gray-400 text-sm">Rating points</div>
+                        <div className="text-white font-bold text-2xl">
+                          {profile.rating_points} pts
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-gray-400 text-sm">Current rank</div>
+                        <div className="text-blue-400 font-medium text-lg">
+                          {getDisplayRank()}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div className="space-y-3">
+
+                  <div className="space-y-4">
                     <Link
                       href="/new-game"
-                      className="block w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-center"
+                      className="block w-full bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-colors text-center"
                     >
                       Play a game
                     </Link>
+
                     <Link
                       href="/test-ranking"
-                      className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-center"
+                      className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-colors text-center"
                     >
                       Test ranking system
                     </Link>

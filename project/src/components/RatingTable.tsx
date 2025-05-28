@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { generateRatingTable, getTablePosition, formatKomi } from '@/lib/gameSettings'
 
 interface RatingTableProps {
@@ -12,6 +13,8 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
   const highlightPosition = highlightRatingDifference !== undefined 
     ? getTablePosition(highlightRatingDifference) 
     : null
+
+  const [hoveredCell, setHoveredCell] = useState<{ rowIndex: number; komiIndex: number } | null>(null)
 
   return (
     <div className={`bg-gray-800 rounded-lg p-6 ${className}`}>
@@ -27,7 +30,7 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
               <td className="bg-gray-800 text-white p-2 border border-gray-600 font-medium text-center" colSpan={13}>
                 Points difference
               </td>
-              <td className="bg-gray-700 text-white p-2 border border-gray-600 font-medium text-center">
+              <td className="bg-indigo-900 text-indigo-100 p-2 border border-indigo-700 font-medium text-center">
                 Handicap stones
               </td>
             </tr>
@@ -37,6 +40,8 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
                   const isHighlighted = highlightPosition && 
                     highlightPosition.handicapStones === row.handicap && 
                     highlightPosition.komiIndex === komiIndex
+                  
+                  const isHovered = hoveredCell?.rowIndex === rowIndex && hoveredCell?.komiIndex === komiIndex
                   
                   // Calculate the actual rating difference for this cell
                   let ratingDifference
@@ -51,18 +56,23 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
                   return (
                     <td
                       key={komiIndex}
-                      className={`p-2 border border-gray-600 text-center text-sm ${
+                      className={`p-2 border border-gray-600 text-center text-sm transition-colors duration-150 ${
                         isHighlighted
-                          ? 'bg-blue-600 text-white font-bold'
-                          : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                          ? 'bg-amber-600 text-white font-bold'
+                          : isHovered
+                          ? 'bg-gray-600 text-white'
+                          : 'bg-gray-800 text-gray-300 hover:bg-gray-600'
                       }`}
-                      title={`Rating difference: ${ratingDifference} points`}
+                      onMouseEnter={() => setHoveredCell({ rowIndex, komiIndex })}
+                      onMouseLeave={() => setHoveredCell(null)}
                     >
                       {ratingDifference}
                     </td>
                   )
                 })}
-                <td className="bg-gray-700 text-white p-2 border border-gray-600 font-medium text-center">
+                <td className={`bg-indigo-900 text-indigo-100 p-2 border border-indigo-700 font-medium text-center transition-colors duration-150 ${
+                  hoveredCell?.rowIndex === rowIndex ? 'bg-indigo-700' : ''
+                }`}>
                   {row.handicap}
                 </td>
               </tr>
@@ -70,11 +80,13 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
             {/* Komi row at the bottom */}
             <tr>
               {Array.from({ length: 13 }, (_, i) => (
-                <td key={i} className="bg-gray-600 text-gray-300 p-2 border border-gray-600 text-sm text-center">
+                <td key={i} className={`bg-teal-900 text-teal-100 p-2 border border-teal-700 text-sm text-center transition-colors duration-150 ${
+                  hoveredCell?.komiIndex === i ? 'bg-teal-700' : ''
+                }`}>
                   {formatKomi(6.5 - i)}
                 </td>
               ))}
-              <td className="bg-gray-600 text-gray-300 p-2 border border-gray-600 font-medium text-center">
+              <td className="bg-teal-900 text-teal-100 p-2 border border-teal-700 font-medium text-center">
                 Komi
               </td>
             </tr>
@@ -87,7 +99,7 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
         <p>• Right column = Handicap stones (0 = even game, then 2-9)</p>
         <p>• Bottom row = Komi value ({formatKomi(6.5)} to {formatKomi(-5.5)})</p>
         {highlightPosition && (
-          <p className="text-blue-400 font-medium">
+          <p className="text-amber-400 font-medium">
             • Highlighted cell shows current game settings
           </p>
         )}

@@ -148,83 +148,76 @@ export default function NewGamePage() {
           <p className="text-gray-400">Choose your opponent to see game settings</p>
         </div>
 
-        {/* Current Player Info */}
-        <div className="bg-gray-800 rounded-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold text-white mb-2">You</h2>
-          <div className="flex items-center justify-between">
-            <span className="text-white font-medium text-xl">{profile.name}</span>
-            <div className="text-right">
-              <div className="text-blue-400 font-medium">{getDisplayRank(profile)}</div>
-              <div className="text-gray-400 text-sm">{profile.rating_points} points</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Opponent Selection */}
+        {/* Combined Player Selection */}
         <div className="bg-gray-800 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Select Opponent ({opponents.length} players)
-          </h2>
-          
-          {opponents.length === 0 ? (
-            <div className="text-gray-400 text-center py-8">
-              No other players found. Invite friends to join Zugol!
-            </div>
-          ) : (
-            <div className="relative">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search for an opponent..."
-                  value={selectedOpponent ? selectedOpponent.name : searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value)
-                    setIsDropdownOpen(true)
-                    if (selectedOpponent) {
-                      setSelectedOpponentId('')
-                    }
-                  }}
-                  onFocus={() => setIsDropdownOpen(true)}
-                  className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  {isDropdownOpen ? '▲' : '▼'}
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-xl font-semibold text-white whitespace-nowrap">
+              You ({profile.name}) vs
+            </span>
+            
+            {opponents.length === 0 ? (
+              <span className="text-gray-400">No other players found</span>
+            ) : (
+              <div className="relative flex-1">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Choose opponent"
+                    value={selectedOpponent ? selectedOpponent.name : searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value)
+                      setIsDropdownOpen(true)
+                      if (selectedOpponent) {
+                        setSelectedOpponentId('')
+                      }
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    {isDropdownOpen ? '▲' : '▼'}
+                  </div>
                 </div>
-              </div>
 
-              {isDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {filteredOpponents.length === 0 ? (
-                    <div className="p-3 text-gray-400 text-center">No players found</div>
-                  ) : (
-                    filteredOpponents.map((opponent) => {
-                      const ratingDifference = opponent.rating_points - profile.rating_points
-                      const displayRank = ratingPointsToRank(opponent.rating_points)
-                      
-                      return (
-                        <button
-                          key={opponent.id}
-                          onClick={() => handleOpponentSelect(opponent.id)}
-                          className="w-full text-left p-3 hover:bg-gray-600 transition-colors border-b border-gray-600 last:border-b-0"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-white font-medium">{opponent.name}</div>
-                              <div className="text-gray-400 text-sm">
-                                Rating difference: {ratingDifference > 0 ? '+' : ''}{ratingDifference} points
+                {isDropdownOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOpponents.length === 0 ? (
+                      <div className="p-3 text-gray-400 text-center">No players found</div>
+                    ) : (
+                      filteredOpponents.map((opponent) => {
+                        const ratingDifference = opponent.rating_points - profile.rating_points
+                        const displayRank = getDisplayRank(opponent)
+                        
+                        return (
+                          <button
+                            key={opponent.id}
+                            onClick={() => handleOpponentSelect(opponent.id)}
+                            className="w-full text-left p-3 hover:bg-gray-600 transition-colors border-b border-gray-600 last:border-b-0"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-white font-medium">{opponent.name}</div>
+                                <div className="text-gray-400 text-sm">
+                                  Rating difference: {ratingDifference > 0 ? '+' : ''}{ratingDifference} points
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-white text-sm">{opponent.rating_points} pts <span className="text-blue-400">({displayRank})</span></div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-blue-400 font-medium">{displayRank}</div>
-                              <div className="text-gray-400 text-sm">{opponent.rating_points} points</div>
-                            </div>
-                          </div>
-                        </button>
-                      )
-                    })
-                  )}
-                </div>
-              )}
+                          </button>
+                        )
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {opponents.length === 0 && (
+            <div className="text-gray-400 text-center py-4">
+              Invite friends to join Zugol!
             </div>
           )}
         </div>
