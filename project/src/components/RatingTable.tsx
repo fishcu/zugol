@@ -103,6 +103,11 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
             • Highlighted cell shows current game settings
           </p>
         )}
+        {highlightRatingDifference !== undefined && !highlightPosition && (
+          <p className="text-red-400 font-medium">
+            • Rating difference ({highlightRatingDifference} pts) exceeds table range — using 9 handicap stones with extended komi
+          </p>
+        )}
       </div>
     </div>
   )

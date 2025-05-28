@@ -61,7 +61,7 @@ export function calculateGameSettings(player1: Player, player2: Player): GameSet
   const blackPlayer = isPlayer1Weaker ? player1 : player2
   const whitePlayer = isPlayer1Weaker ? player2 : player1
   
-  // Calculate handicap stones: 0 for first 13 points, then 2, 3, 4, ..., 9
+  // Calculate handicap stones: 0 for first 13 points, then 2, 3, 4, ..., 9 (capped at 9)
   let handicapStones
   if (ratingDifference <= 12) {
     handicapStones = 0 // Even game with komi adjustment
@@ -70,8 +70,18 @@ export function calculateGameSettings(player1: Player, player2: Player): GameSet
   }
   
   // Calculate komi based on position within the 13-point range
-  const komiPosition = ratingDifference % 13
-  const komi = 6.5 - komiPosition
+  // For extreme differences beyond the table (>116), continue adding komi
+  let komi
+  if (ratingDifference <= 116) {
+    // Normal case: within the table range
+    const komiPosition = ratingDifference % 13
+    komi = 6.5 - komiPosition
+  } else {
+    // Extreme case: beyond table range (>116)
+    // Start from -5.5 (the limit of the table) and subtract 1 for each point beyond 116
+    const beyondTablePoints = ratingDifference - 116
+    komi = -5.5 - beyondTablePoints
+  }
   
   return {
     blackPlayer: {
@@ -134,7 +144,7 @@ export function generateRatingTable(maxHandicap: number = 9) {
 /**
  * Get the table position (handicap, komi index) for a given rating difference
  * @param ratingDifference Absolute rating difference
- * @returns Object with handicap stones and komi index (0-12)
+ * @returns Object with handicap stones and komi index (0-12), or null if beyond table range
  */
 export function getTablePosition(ratingDifference: number) {
   if (ratingDifference === 0) {
@@ -143,6 +153,13 @@ export function getTablePosition(ratingDifference: number) {
       handicapStones: 0,
       komiIndex: 0 // 6.5 komi
     }
+  }
+  
+  // Check if rating difference is beyond the table range (>116)
+  // Table covers: 0-12 (0 handicap), 13-25 (2 handicap), ..., 104-116 (9 handicap)
+  if (ratingDifference > 116) {
+    // Beyond table range - don't highlight anything
+    return null
   }
   
   let handicapStones
