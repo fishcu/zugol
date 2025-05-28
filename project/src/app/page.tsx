@@ -65,19 +65,22 @@ export default function HomePage() {
                       onClick={signOut}
                       className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
-                      Sign Out
+                      Sign out
                     </button>
                   </div>
                   
                   <div className="space-y-3">
-                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                      Report Game Result
-                    </button>
+                    <Link
+                      href="/new-game"
+                      className="block w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-center"
+                    >
+                      Play a game
+                    </Link>
                     <Link
                       href="/test-ranking"
                       className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-center"
                     >
-                      Test Ranking System
+                      Test ranking system
                     </Link>
                   </div>
                 </div>
@@ -93,7 +96,7 @@ export default function HomePage() {
                     href="/login"
                     className="block w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
                   >
-                    Sign In
+                    Sign in
                   </Link>
                 </div>
               )}

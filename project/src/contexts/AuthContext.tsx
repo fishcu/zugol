@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase, getDisplayRank } from '@/lib/supabase'
 
@@ -30,8 +30,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const currentUserIdRef = useRef<string | null>(null)
 
-  console.log('AuthProvider render - user:', !!user, 'profile:', !!profile, 'loading:', loading)
+  // Update ref whenever user changes
+  useEffect(() => {
+    currentUserIdRef.current = user?.id ?? null
+  }, [user])
 
   useEffect(() => {
     // Get initial session
@@ -51,19 +55,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes - IMPORTANT: No async Supabase calls in this callback!
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, !!session?.user)
-        setUser(session?.user ?? null)
+        // Only update if the user actually changed
+        const newUserId = session?.user?.id ?? null
+        const currentUserId = currentUserIdRef.current
         
-        if (session?.user) {
-          // Use setTimeout to avoid deadlock as per Supabase docs
-          setTimeout(() => {
-            fetchProfile(session.user.id)
-          }, 0)
-        } else {
-          setProfile(null)
+        if (newUserId !== currentUserId) {
+          setUser(session?.user ?? null)
+          
+          if (session?.user) {
+            // Use setTimeout to avoid deadlock as per Supabase docs
+            setTimeout(() => {
+              fetchProfile(session.user.id)
+            }, 0)
+          } else {
+            setProfile(null)
+          }
+          
+          setLoading(false)
         }
-        
-        setLoading(false)
       }
     )
 
@@ -81,7 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (error) {
-        console.error('Error fetching profile:', error)
         return
       }
 
@@ -92,24 +100,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    const timestamp = new Date().toISOString()
-    console.log(`[${timestamp}] === SIGNOUT FUNCTION CALLED ===`)
-    console.log(`[${timestamp}] Current user:`, !!user, user?.id)
-    
     try {
-      console.log(`[${timestamp}] Calling supabase.auth.signOut()...`)
-      const { error } = await supabase.auth.signOut()
-      
-      if (error) {
-        console.error(`[${timestamp}] Error signing out:`, error)
-      } else {
-        console.log(`[${timestamp}] Sign out successful`)
-      }
+      await supabase.auth.signOut()
     } catch (error) {
-      console.error(`[${timestamp}] Unexpected error during sign out:`, error)
+      console.error('Unexpected error during sign out:', error)
     }
-    
-    console.log(`[${timestamp}] === SIGNOUT FUNCTION COMPLETED ===`)
   }
 
   const getDisplayRankForProfile = () => {

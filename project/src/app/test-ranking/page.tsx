@@ -99,14 +99,14 @@ export default function TestRankingPage() {
               disabled={isSimulating}
               className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
             >
-              {isSimulating ? 'Simulating...' : 'Win Game (+1)'}
+              {isSimulating ? 'Simulating...' : 'Win game (+1)'}
             </button>
             <button
               onClick={() => simulateGame(false)}
               disabled={isSimulating}
               className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
             >
-              {isSimulating ? 'Simulating...' : 'Lose Game (-1)'}
+              {isSimulating ? 'Simulating...' : 'Lose game (-1)'}
             </button>
           </div>
           {lastResult && (
@@ -133,7 +133,7 @@ export default function TestRankingPage() {
             href="/"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
           >
-            Back to Home
+            Back to home
           </a>
         </div>
       </div>
