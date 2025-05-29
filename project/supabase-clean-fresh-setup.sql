@@ -13,8 +13,7 @@ CREATE TABLE public.profiles (
   name TEXT NOT NULL,
   rating_points INTEGER NOT NULL DEFAULT 137,
   last_rank_reached TEXT NOT NULL DEFAULT '15k',
-  games_at_last_rank_change INTEGER NOT NULL DEFAULT 0,
-  total_games_played INTEGER NOT NULL DEFAULT 0,
+  games_since_last_rank_change INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -103,15 +102,13 @@ BEGIN
     name, 
     rating_points, 
     last_rank_reached, 
-    games_at_last_rank_change, 
-    total_games_played
+    games_since_last_rank_change
   )
   VALUES (
     NEW.id, 
     COALESCE(NEW.raw_user_meta_data->>'name', 'Anonymous Player'),
     user_rating_points,
     user_rank,
-    0,
     0
   );
   RETURN NEW;

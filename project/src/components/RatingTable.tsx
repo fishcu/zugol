@@ -56,7 +56,7 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
                   return (
                     <td
                       key={komiIndex}
-                      className={`p-2 border border-gray-600 text-center text-sm transition-colors duration-150 ${
+                      className={`p-2 border border-gray-600 text-center text-sm transition-colors duration-150 cursor-pointer ${
                         isHighlighted
                           ? 'bg-amber-600 text-white font-bold'
                           : isHovered
@@ -70,8 +70,15 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
                     </td>
                   )
                 })}
-                <td className={`bg-indigo-900 text-indigo-100 p-2 border border-indigo-700 font-medium text-center transition-colors duration-150 ${
-                  hoveredCell?.rowIndex === rowIndex ? 'bg-indigo-700' : ''
+                <td className={`p-2 border border-indigo-700 font-medium text-center transition-colors duration-150 ${
+                  // Show hover effect if this row is hovered
+                  hoveredCell?.rowIndex === rowIndex
+                    ? 'bg-indigo-600 text-indigo-100'
+                    // Show highlight effect if this row matches the highlighted position and nothing is hovered
+                    : !hoveredCell && highlightPosition && highlightPosition.handicapStones === row.handicap
+                    ? 'bg-indigo-600 text-indigo-100'
+                    // Default state
+                    : 'bg-indigo-900 text-indigo-100'
                 }`}>
                   {row.handicap}
                 </td>
@@ -80,8 +87,15 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
             {/* Komi row at the bottom */}
             <tr>
               {Array.from({ length: 13 }, (_, i) => (
-                <td key={i} className={`bg-teal-900 text-teal-100 p-2 border border-teal-700 text-sm text-center transition-colors duration-150 ${
-                  hoveredCell?.komiIndex === i ? 'bg-teal-700' : ''
+                <td key={i} className={`p-2 border border-teal-700 text-sm text-center transition-colors duration-150 ${
+                  // Show hover effect if this column is hovered
+                  hoveredCell?.komiIndex === i 
+                    ? 'bg-teal-600 text-teal-100'
+                    // Show highlight effect if this column matches the highlighted position and nothing is hovered
+                    : !hoveredCell && highlightPosition && highlightPosition.komiIndex === i
+                    ? 'bg-teal-600 text-teal-100'
+                    // Default state
+                    : 'bg-teal-900 text-teal-100'
                 }`}>
                   {formatKomi(6.5 - i)}
                 </td>
@@ -95,6 +109,7 @@ export default function RatingTable({ highlightRatingDifference, className = '' 
       </div>
       
       <div className="mt-4 text-sm text-gray-400 space-y-1">
+        <p>• Hover over any cell to see corresponding handicap stones and komi</p>
         <p>• Each cell shows the rating point difference</p>
         <p>• Right column = Handicap stones (0 = even game, then 2-9)</p>
         <p>• Bottom row = Komi value ({formatKomi(6.5)} to {formatKomi(-5.5)})</p>

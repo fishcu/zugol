@@ -46,8 +46,7 @@ export default function TestRankingPage() {
 
   const ratingBasedRank = ratingPointsToRank(profile.rating_points)
   const displayRank = getDisplayRank()
-  const gamesSinceRankChange = profile.total_games_played - profile.games_at_last_rank_change
-  const isRankFrozen = gamesSinceRankChange < 5
+  const isRankFrozen = profile.games_since_last_rank_change < 5
   const showsAsterisk = displayRank.includes('*')
 
   return (
@@ -66,31 +65,27 @@ export default function TestRankingPage() {
             <p><span className="text-blue-400">Rating-based Rank:</span> <span className="text-blue-400">{ratingBasedRank}</span></p>
             <p><span className="text-blue-400">Last Rank Reached:</span> <span className="text-blue-400">{profile.last_rank_reached}</span></p>
             <p><span className="text-blue-400">Display Rank:</span> <span className="text-lg font-bold text-blue-400">{displayRank}</span></p>
-            <p><span className="text-blue-400">Games Since Rank Change:</span> {gamesSinceRankChange}</p>
-            <p><span className="text-blue-400">Games at Last Rank Change:</span> {profile.games_at_last_rank_change}</p>
-            <p><span className="text-blue-400">Total Games Played:</span> {profile.total_games_played}</p>
+            <p><span className="text-blue-400">Games Since Rank Change:</span> {profile.games_since_last_rank_change}</p>
           </div>
         </div>
 
         {/* Status Indicators */}
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Rank Status</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Status</h2>
           <div className="space-y-2">
             <div className={`p-3 rounded ${isRankFrozen ? 'bg-yellow-900 text-yellow-200' : 'bg-green-900 text-green-200'}`}>
-              <strong>Rank Frozen:</strong> {isRankFrozen ? 'Yes (Hysteresis active)' : 'No (Normal mode)'}
+              <strong>Rank Status:</strong> {isRankFrozen ? 'Frozen (in hysteresis period)' : 'Active (can change immediately)'}
             </div>
             <div className={`p-3 rounded ${showsAsterisk ? 'bg-blue-900 text-blue-200' : 'bg-gray-700 text-gray-300'}`}>
-              <strong>Shows Asterisk:</strong> {showsAsterisk ? 'Yes (Recent rank change)' : 'No'}
+              <strong>Asterisk:</strong> {showsAsterisk ? 'Showing (recent rank change)' : 'Not showing'}
             </div>
-            {isRankFrozen && (
-              <div className="p-3 rounded bg-purple-900 text-purple-200">
-                <strong>Games until unfrozen:</strong> {5 - gamesSinceRankChange}
-              </div>
-            )}
+            <div className="p-3 bg-gray-700 rounded text-gray-300">
+              <strong>Games until unfrozen:</strong> {isRankFrozen ? 5 - profile.games_since_last_rank_change : 'Already unfrozen'}
+            </div>
           </div>
         </div>
 
-        {/* Simulation Controls */}
+        {/* Simulate Games */}
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold text-white mb-4">Simulate Games</h2>
           <div className="flex gap-4 mb-4">
@@ -133,7 +128,7 @@ export default function TestRankingPage() {
             href="/"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
           >
-            Back to home
+            Back to Home
           </a>
         </div>
       </div>

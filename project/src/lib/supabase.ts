@@ -5,6 +5,32 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+// Database types
+export interface Profile {
+  id: string
+  name: string
+  rating_points: number
+  last_rank_reached: string
+  games_since_last_rank_change: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ProfileUpdate {
+  name?: string
+  rating_points?: number
+  last_rank_reached?: string
+  games_since_last_rank_change?: number
+}
+
+export interface ProfileInsert {
+  id: string
+  name: string
+  rating_points?: number
+  last_rank_reached?: string
+  games_since_last_rank_change?: number
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -14,8 +40,7 @@ export type Database = {
           name: string
           rating_points: number
           last_rank_reached: string
-          games_at_last_rank_change: number
-          total_games_played: number
+          games_since_last_rank_change: number
           created_at: string
           updated_at: string
         }
@@ -24,8 +49,7 @@ export type Database = {
           name: string
           rating_points?: number
           last_rank_reached?: string
-          games_at_last_rank_change?: number
-          total_games_played?: number
+          games_since_last_rank_change?: number
           created_at?: string
           updated_at?: string
         }
@@ -34,8 +58,7 @@ export type Database = {
           name?: string
           rating_points?: number
           last_rank_reached?: string
-          games_at_last_rank_change?: number
-          total_games_played?: number
+          games_since_last_rank_change?: number
           created_at?: string
           updated_at?: string
         }
@@ -87,14 +110,12 @@ export function ratingPointsToRank(points: number): string {
 export function getDisplayRank(profile: {
   rating_points: number
   last_rank_reached: string
-  games_at_last_rank_change: number
-  total_games_played: number
+  games_since_last_rank_change: number
 }): string {
   const FREEZE_PERIOD = 5
   const ratingBasedRank = ratingPointsToRank(profile.rating_points)
-  const gamesSinceRankChange = profile.total_games_played - profile.games_at_last_rank_change
   
-  if (gamesSinceRankChange >= FREEZE_PERIOD) {
+  if (profile.games_since_last_rank_change >= FREEZE_PERIOD) {
     return ratingBasedRank
   } else {
     return `${profile.last_rank_reached}*`
@@ -106,23 +127,22 @@ export function updateRankAfterGame(
   oldRatingPoints: number,
   newRatingPoints: number,
   lastRankReached: string,
-  gamesAtLastRankChange: number,
-  totalGamesPlayed: number
+  gamesSinceLastRankChange: number
 ): {
   newLastRankReached: string
-  newGamesAtLastRankChange: number
+  newGamesSinceLastRankChange: number
   rankChanged: boolean
 } {
   const FREEZE_PERIOD = 5
   const newRatingRank = ratingPointsToRank(newRatingPoints)
-  const gamesSinceRankChangeAfterThisGame = (totalGamesPlayed + 1) - gamesAtLastRankChange
+  const gamesSinceRankChangeAfterThisGame = gamesSinceLastRankChange + 1
   
   // Check for rank changes if we're not in freeze period after this game
   if (gamesSinceRankChangeAfterThisGame >= FREEZE_PERIOD) {
     if (newRatingRank !== lastRankReached) {
       return {
         newLastRankReached: newRatingRank,
-        newGamesAtLastRankChange: totalGamesPlayed + 1,
+        newGamesSinceLastRankChange: 0,
         rankChanged: true
       }
     }
@@ -130,7 +150,7 @@ export function updateRankAfterGame(
   
   return {
     newLastRankReached: lastRankReached,
-    newGamesAtLastRankChange: gamesAtLastRankChange,
+    newGamesSinceLastRankChange: gamesSinceRankChangeAfterThisGame,
     rankChanged: false
   }
 } 

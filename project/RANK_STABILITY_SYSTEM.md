@@ -14,8 +14,7 @@ The rank stability system introduces two key features:
 
 The `profiles` table includes these columns for rank stability:
 - `last_rank_reached`: The current displayed rank (frozen during hysteresis period)
-- `games_at_last_rank_change`: Game number when rank last changed
-- `total_games_played`: Total number of games played by the user
+- `games_since_last_rank_change`: Number of games played since the rank last changed
 
 ### Rank Change Detection
 
@@ -25,7 +24,7 @@ When a game result is processed:
 3. If outside freeze period, compare new rating-based rank with current displayed rank
 4. If different, a rank change occurred:
    - Set `last_rank_reached` to the new rank
-   - Set `games_at_last_rank_change` to current game number
+   - Reset `games_since_last_rank_change` to 0
 
 ### Display Logic
 
@@ -33,9 +32,8 @@ The display rank is determined by:
 ```typescript
 function getDisplayRank(profile) {
   const ratingBasedRank = ratingPointsToRank(profile.rating_points)
-  const gamesSinceRankChange = profile.total_games_played - profile.games_at_last_rank_change
   
-  if (gamesSinceRankChange >= 5) {
+  if (profile.games_since_last_rank_change >= 5) {
     return ratingBasedRank  // Unfrozen
   } else {
     return `${profile.last_rank_reached}*`  // Frozen with asterisk
@@ -45,12 +43,12 @@ function getDisplayRank(profile) {
 
 ### States and Transitions
 
-1. **Normal State** (`games_since_rank_change >= 5`):
+1. **Normal State** (`games_since_last_rank_change >= 5`):
    - Display rank = rating-based rank
    - No asterisk shown
    - Rank can change immediately if rating crosses threshold
 
-2. **Frozen State** (`games_since_rank_change < 5`):
+2. **Frozen State** (`games_since_last_rank_change < 5`):
    - Display rank = `last_rank_reached` (frozen at time of change)
    - Asterisk shown
    - Rating can continue to change, but display rank stays frozen
@@ -60,11 +58,11 @@ function getDisplayRank(profile) {
 ### Example 1: Rank Up
 - Player at 15k (137 points) wins game (+13 points = 150 points)
 - Rating-based rank becomes 14k
-- `last_rank_reached` = "14k", `games_at_last_rank_change` = current game
+- `last_rank_reached` = "14k", `games_since_last_rank_change` = 0
 - Display: "14k*" for next 5 games
 
 ### Example 2: Hysteresis Prevention
-- Player just ranked up to 14k* (2 games ago)
+- Player just ranked up to 14k* (2 games ago, `games_since_last_rank_change` = 2)
 - Loses game (-13 points), rating drops back to 15k range
 - Display still shows "14k*" (frozen)
 - After 3 more games, unfreezes and shows actual rating-based rank
@@ -87,7 +85,7 @@ function getDisplayRank(profile) {
 - `src/app/test-ranking/page.tsx`: Testing interface for the system
 
 ### Database
-- `supabase-simplified-rank-migration.sql`: Current migration for the system
+- `supabase-clean-fresh-setup.sql`: Current setup script for the system
 
 ## Testing
 

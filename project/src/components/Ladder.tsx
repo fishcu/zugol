@@ -9,8 +9,7 @@ interface Profile {
   name: string
   rating_points: number
   last_rank_reached: string
-  games_at_last_rank_change: number
-  total_games_played: number
+  games_since_last_rank_change: number
   created_at: string
   updated_at: string
 }

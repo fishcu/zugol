@@ -33,16 +33,14 @@ export async function updatePlayerRating(
       oldRatingPoints,
       newRatingPoints,
       currentProfile.last_rank_reached,
-      currentProfile.games_at_last_rank_change,
-      currentProfile.total_games_played
+      currentProfile.games_since_last_rank_change
     )
 
     // Update the profile with new data
     const updateData = {
       rating_points: newRatingPoints,
       last_rank_reached: rankUpdate.newLastRankReached,
-      games_at_last_rank_change: rankUpdate.newGamesAtLastRankChange,
-      total_games_played: currentProfile.total_games_played + 1,
+      games_since_last_rank_change: rankUpdate.newGamesSinceLastRankChange,
       updated_at: new Date().toISOString()
     }
     
