@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase, getDisplayRank } from '@/lib/supabase'
+import { getLastGameDate } from '@/lib/gamesUtils'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Profile {
@@ -20,6 +21,7 @@ type SortDirection = 'asc' | 'desc'
 export default function Ladder() {
   const { user } = useAuth()
   const [profiles, setProfiles] = useState<Profile[]>([])
+  const [lastGameDates, setLastGameDates] = useState<Record<string, string | null>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sortField, setSortField] = useState<SortField>('rating_points')
@@ -42,12 +44,40 @@ export default function Ladder() {
         return
       }
 
-      setProfiles(data || [])
+      const profilesData = data || []
+      setProfiles(profilesData)
+
+      // Fetch last game dates for all players
+      await fetchLastGameDates(profilesData)
     } catch (err) {
       setError('Unexpected error occurred')
       console.error('Unexpected error:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchLastGameDates = async (profilesData: Profile[]) => {
+    try {
+      const lastGamePromises = profilesData.map(async (profile) => {
+        const result = await getLastGameDate(profile.id)
+        return {
+          playerId: profile.id,
+          lastGameDate: result.success ? (result.lastGameDate || null) : null
+        }
+      })
+
+      const results = await Promise.all(lastGamePromises)
+      const lastGameDatesMap: Record<string, string | null> = {}
+      
+      results.forEach(({ playerId, lastGameDate }) => {
+        lastGameDatesMap[playerId] = lastGameDate
+      })
+
+      setLastGameDates(lastGameDatesMap)
+    } catch (err) {
+      console.error('Error fetching last game dates:', err)
+      // Continue without last game dates - will fall back to profile.updated_at
     }
   }
 
@@ -58,6 +88,17 @@ export default function Ladder() {
       setSortField(field)
       setSortDirection(field === 'name' ? 'asc' : 'desc')
     }
+  }
+
+  const getLastGameDateForProfile = (profile: Profile): string | null => {
+    // Use actual last game date from games database
+    const actualLastGameDate = lastGameDates[profile.id] || null
+    if (actualLastGameDate) {
+      return actualLastGameDate
+    }
+    
+    // No games played - return null to show "—"
+    return null
   }
 
   const getSortedProfiles = () => {
@@ -75,8 +116,14 @@ export default function Ladder() {
           bValue = b.rating_points
           break
         case 'last_game_played':
-          aValue = new Date(a.updated_at).getTime()
-          bValue = new Date(b.updated_at).getTime()
+          const aLastGame = getLastGameDateForProfile(a)
+          const bLastGame = getLastGameDateForProfile(b)
+          // Put players with no games at the end
+          if (!aLastGame && !bLastGame) return 0
+          if (!aLastGame) return 1
+          if (!bLastGame) return -1
+          aValue = new Date(aLastGame).getTime()
+          bValue = new Date(bLastGame).getTime()
           break
         default:
           return 0
@@ -97,8 +144,14 @@ export default function Ladder() {
       : <span className="text-blue-400 ml-1">▼</span>
   }
 
-  const formatLastGamePlayed = (updatedAt: string) => {
-    const date = new Date(updatedAt)
+  const formatLastGamePlayed = (profile: Profile): string => {
+    const lastGameDate = getLastGameDateForProfile(profile)
+    
+    if (!lastGameDate) {
+      return '—'
+    }
+    
+    const date = new Date(lastGameDate)
     return date.toLocaleDateString()
   }
 
@@ -227,7 +280,7 @@ export default function Ladder() {
                         </span>
                       </td>
                       <td className="py-3 text-gray-400">
-                        {formatLastGamePlayed(profile.updated_at)}
+                        {formatLastGamePlayed(profile)}
                       </td>
                     </tr>
                   )

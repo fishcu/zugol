@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase, ratingPointsToRank, getDisplayRank } from '@/lib/supabase'
 import { calculateGameSettings, Player } from '@/lib/gameSettings'
 import GameSettingsDisplay from '@/components/GameSettings'
+import GameRecordForm from '@/components/GameRecordForm'
 import RatingTable from '@/components/RatingTable'
 
 interface Profile {
@@ -226,6 +227,19 @@ export default function NewGamePage() {
           <>
             <div className="mb-8">
               <GameSettingsDisplay gameSettings={gameSettings} />
+            </div>
+
+            {/* Game Record Form */}
+            <div className="mb-8">
+              <GameRecordForm
+                blackPlayerId={gameSettings.blackPlayer.id}
+                whitePlayerId={gameSettings.whitePlayer.id}
+                blackPlayerName={gameSettings.blackPlayer.name}
+                whitePlayerName={gameSettings.whitePlayer.name}
+                onGameRecorded={() => {
+                  // Game recorded successfully - could refresh data or show additional feedback here if needed
+                }}
+              />
             </div>
 
             {/* Rating Table */}

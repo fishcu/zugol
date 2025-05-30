@@ -29,18 +29,23 @@ body {
     background-color: rgb(55 65 81 / 0.5);
   }
   
-  /* Layout: CSS Grid for main content with ladder peek */
+  /* Layout: Flexible layout for main content with dynamic ladder positioning */
   .layout-container {
-    display: grid;
-    grid-template-rows: minmax(600px, 85vh) auto;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   
   .main-content {
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    min-height: 600px;
+    min-height: 0; /* Allow shrinking */
+  }
+  
+  .ladder-section {
+    flex: 0 0 auto;
+    min-height: 200px; /* Minimum peek height */
   }
   
   /* Ladder table: Stable alternating rows */

@@ -31,6 +31,43 @@ export interface ProfileInsert {
   games_since_last_rank_change?: number
 }
 
+// Games database types
+export interface Game {
+  id: string
+  played_at: string
+  black_player_id: string
+  white_player_id: string
+  winner: 'black' | 'white' | 'draw'
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface GameInsert {
+  played_at?: string
+  black_player_id: string
+  white_player_id: string
+  winner: 'black' | 'white' | 'draw'
+  notes?: string
+}
+
+export interface GameUpdate {
+  played_at?: string
+  winner?: 'black' | 'white' | 'draw'
+  notes?: string
+}
+
+// Recent game data (from get_recent_games function)
+export interface RecentGame {
+  game_id: string
+  played_at: string
+  opponent_id: string
+  opponent_name: string
+  player_color: 'black' | 'white'
+  result: 'win' | 'loss' | 'draw'
+  notes: string | null
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -62,6 +99,61 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
+      }
+      games: {
+        Row: {
+          id: string
+          played_at: string
+          black_player_id: string
+          white_player_id: string
+          winner: 'black' | 'white' | 'draw'
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          played_at?: string
+          black_player_id: string
+          white_player_id: string
+          winner: 'black' | 'white' | 'draw'
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          played_at?: string
+          black_player_id?: string
+          white_player_id?: string
+          winner?: 'black' | 'white' | 'draw'
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+    }
+    Functions: {
+      get_recent_games: {
+        Args: {
+          player_id: string
+          game_limit?: number
+        }
+        Returns: {
+          game_id: string
+          played_at: string
+          opponent_id: string
+          opponent_name: string
+          player_color: 'black' | 'white'
+          result: 'win' | 'loss' | 'draw'
+          notes: string | null
+        }[]
+      }
+      get_last_game_date: {
+        Args: {
+          player_id: string
+        }
+        Returns: string | null
       }
     }
   }
