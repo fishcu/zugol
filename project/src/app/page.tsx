@@ -24,7 +24,7 @@ export default function HomePage() {
     
     setGamesLoading(true)
     try {
-      const result = await getRecentGames(user.id)
+      const result = await getRecentGames(user.id, 10)
       if (result.success && result.games) {
         setRecentGames(result.games)
         setSelectedGameIndex(0) // Reset to latest game when data loads
@@ -79,7 +79,6 @@ export default function HomePage() {
           className={`inline-block w-8 h-8 text-center text-sm font-bold ${colorClass} rounded-sm mr-1 mb-1 leading-8 transition-all hover:scale-110 ${
             isSelected ? 'bg-gray-600 ring-2 ring-blue-400' : 'bg-gray-700 hover:bg-gray-600'
           }`}
-          title={`${game.result === 'win' ? 'Won' : game.result === 'loss' ? 'Lost' : 'Draw'} vs ${game.opponent_name} on ${new Date(game.played_at).toLocaleDateString()}`}
         >
           {letter}
         </button>

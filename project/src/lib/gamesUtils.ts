@@ -109,6 +109,7 @@ export async function getPlayerGames(playerId: string): Promise<{
       `)
       .or(`black_player_id.eq.${playerId},white_player_id.eq.${playerId}`)
       .order('played_at', { ascending: false })
+      .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Database error fetching player games:', error)

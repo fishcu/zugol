@@ -17,6 +17,7 @@ interface Profile {
 
 type SortField = 'name' | 'rating_points' | 'last_game_played'
 type SortDirection = 'asc' | 'desc'
+type ActivityFilter = 'all' | '1month' | '3months' | '6months' | '1year'
 
 export default function Ladder() {
   const { user } = useAuth()
@@ -26,6 +27,7 @@ export default function Ladder() {
   const [error, setError] = useState<string | null>(null)
   const [sortField, setSortField] = useState<SortField>('rating_points')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [activityFilter, setActivityFilter] = useState<ActivityFilter>('6months')
 
   useEffect(() => {
     fetchProfiles()
@@ -101,8 +103,43 @@ export default function Ladder() {
     return null
   }
 
+  const getFilteredProfiles = () => {
+    if (activityFilter === 'all') {
+      return profiles
+    }
+
+    const now = new Date()
+    let cutoffDate: Date
+
+    switch (activityFilter) {
+      case '1month':
+        cutoffDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+        break
+      case '3months':
+        cutoffDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
+        break
+      case '6months':
+        cutoffDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+        break
+      case '1year':
+        cutoffDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
+        break
+      default:
+        return profiles
+    }
+
+    return profiles.filter(profile => {
+      const lastGameDate = getLastGameDateForProfile(profile)
+      if (!lastGameDate) return false // No games played
+      
+      const gameDate = new Date(lastGameDate)
+      return gameDate >= cutoffDate
+    })
+  }
+
   const getSortedProfiles = () => {
-    return [...profiles].sort((a, b) => {
+    const filteredProfiles = getFilteredProfiles()
+    return [...filteredProfiles].sort((a, b) => {
       let aValue: string | number
       let bValue: string | number
 
@@ -112,6 +149,15 @@ export default function Ladder() {
           bValue = b.name.toLowerCase()
           break
         case 'rating_points':
+          // Prioritize players who have played games over those who haven't
+          const aHasGames = !!getLastGameDateForProfile(a)
+          const bHasGames = !!getLastGameDateForProfile(b)
+          
+          // If one has games and the other doesn't, always prioritize the one with games
+          if (aHasGames && !bHasGames) return -1
+          if (!aHasGames && bHasGames) return 1
+          
+          // If both have games or both don't have games, sort by rating points
           aValue = a.rating_points
           bValue = b.rating_points
           break
@@ -156,7 +202,18 @@ export default function Ladder() {
   }
 
   const getLadderPosition = (profile: Profile, allProfiles: Profile[]) => {
-    const sortedByRating = [...allProfiles].sort((a, b) => b.rating_points - a.rating_points)
+    const sortedByRating = [...allProfiles].sort((a, b) => {
+      // Prioritize players who have played games over those who haven't
+      const aHasGames = !!getLastGameDateForProfile(a)
+      const bHasGames = !!getLastGameDateForProfile(b)
+      
+      // If one has games and the other doesn't, prioritize the one with games
+      if (aHasGames && !bHasGames) return -1
+      if (!aHasGames && bHasGames) return 1
+      
+      // If both have games or both don't have games, sort by rating points (descending)
+      return b.rating_points - a.rating_points
+    })
     return sortedByRating.findIndex(p => p.id === profile.id) + 1
   }
 
@@ -175,6 +232,17 @@ export default function Ladder() {
 
   const isCurrentUser = (profile: Profile) => {
     return user && user.id === profile.id
+  }
+
+  const getActivityFilterLabel = (filter: ActivityFilter) => {
+    switch (filter) {
+      case 'all': return 'All players'
+      case '1month': return 'Active in last month'
+      case '3months': return 'Active in last 3 months'
+      case '6months': return 'Active in last 6 months'
+      case '1year': return 'Active in last year'
+      default: return 'All players'
+    }
   }
 
   if (loading) {
@@ -204,10 +272,30 @@ export default function Ladder() {
   return (
     <div className="bg-gray-800 border-t border-gray-700 p-6">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold text-white mb-6">🪜 Current Standings</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-white">🪜 Current Standings</h2>
+          
+          {/* Activity Filter */}
+          <div className="flex items-center gap-3">
+            <span className="text-gray-400 text-sm">Show:</span>
+            <select
+              value={activityFilter}
+              onChange={(e) => setActivityFilter(e.target.value as ActivityFilter)}
+              className="bg-gray-700 text-white text-sm px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="all">All players</option>
+              <option value="1month">Active in last month</option>
+              <option value="3months">Active in last 3 months</option>
+              <option value="6months">Active in last 6 months</option>
+              <option value="1year">Active in last year</option>
+            </select>
+          </div>
+        </div>
         
         {sortedProfiles.length === 0 ? (
-          <div className="text-gray-400">No players found</div>
+          <div className="text-gray-400">
+            {activityFilter === 'all' ? 'No players found' : `No players found with activity in the selected time period`}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left table-fixed">
@@ -291,7 +379,7 @@ export default function Ladder() {
         )}
         
         <div className="mt-4 text-sm text-gray-500">
-          {sortedProfiles.length} player{sortedProfiles.length !== 1 ? 's' : ''} • 
+          {sortedProfiles.length} player{sortedProfiles.length !== 1 ? 's' : ''} • {getActivityFilterLabel(activityFilter)} • 
           Sorted by {sortField === 'rating_points' ? 'points and rank' : sortField === 'last_game_played' ? 'last game' : 'name'} 
           ({sortDirection === 'desc' ? 'highest first' : 'lowest first'})
         </div>

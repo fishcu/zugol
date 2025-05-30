@@ -24,8 +24,8 @@ CREATE INDEX idx_games_played_at ON public.games(played_at DESC);
 CREATE INDEX idx_games_black_player ON public.games(black_player_id);
 CREATE INDEX idx_games_white_player ON public.games(white_player_id);
 CREATE INDEX idx_games_players_date ON public.games(black_player_id, white_player_id, played_at DESC);
-CREATE INDEX idx_games_player_recent ON public.games(black_player_id, played_at DESC);
-CREATE INDEX idx_games_player_recent_white ON public.games(white_player_id, played_at DESC);
+CREATE INDEX idx_games_player_recent ON public.games(black_player_id, played_at DESC, created_at DESC);
+CREATE INDEX idx_games_player_recent_white ON public.games(white_player_id, played_at DESC, created_at DESC);
 
 -- Create RLS policies
 -- Read: Anyone can view games
@@ -107,7 +107,7 @@ BEGIN
   JOIN profiles bp ON g.black_player_id = bp.id
   JOIN profiles wp ON g.white_player_id = wp.id
   WHERE g.black_player_id = player_id OR g.white_player_id = player_id
-  ORDER BY g.played_at DESC
+  ORDER BY g.played_at DESC, g.created_at DESC
   LIMIT game_limit;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
